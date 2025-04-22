@@ -169,12 +169,33 @@
         return points
       }
 
+      /**
+       * Generates transformation matrix respecting translation, scaling, and rotation
+       * @returns {Matrix} The transformation matrix
+       */
       function transformationMatrix() {
-        let matrix = new Matrix()
+        const translation = new Matrix(
+          1, 0, transX,
+          0, 1, transY,
+          0, 0, 1
+        );
 
-        // TODO: Aufgabe b
+        const scaling = new Matrix(
+          scaleX, 0, 0,
+          0, scaleY, 0,
+          0, 0, 1
+        );
 
-        return matrix
+        const rotRad = rot * (Math.PI / 180)
+        const cos = Math.cos(rotRad);
+        const sin = Math.sin(rotRad);
+        const rotation = new Matrix(
+          cos, -sin, 0,
+          sin,  cos, 0,
+          0,    0,   1
+        );
+
+        return translation.mulMat(scaling).mulMat(rotation);
       }
 
       let points = createPoints()
