@@ -37,6 +37,8 @@
       <p>Rotation: <span id="rotOut"></span></p>
       <label for="rotIn"></label><input type="range" id="rotIn" min="-180" max="180" class="slider" />
     </div>
+    <!-- Lodash for random point generation -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17/lodash.min.js "></script>
     <script>
       let colored = false
       let transX = 0
@@ -150,10 +152,19 @@
         ctx.fill()
       }
 
+      /**
+       * Generates array of randomly distributed points
+       * @returns {Point[]} The generated points
+       */
       function createPoints() {
         let points = []
 
-        // TODO: Aufgabe a
+        const points_amount = _.random(4, 10_000)
+        for (let i = 0; i <= points_amount; i++) {
+          const rand_x = _.random(-offset, offset, true)
+          const rand_y = _.random(-offset, offset, true)
+          points.push(new Point(rand_x, rand_y))
+        }
 
         return points
       }
