@@ -174,28 +174,16 @@
        * @returns {Matrix} The transformation matrix
        */
       function transformationMatrix() {
-        const translation = new Matrix(
-          1, 0, transX,
-          0, 1, transY,
-          0, 0, 1
-        );
+        const translation = new Matrix(1, 0, transX, 0, 1, transY, 0, 0, 1)
 
-        const scaling = new Matrix(
-          scaleX, 0, 0,
-          0, scaleY, 0,
-          0, 0, 1
-        );
+        const scaling = new Matrix(scaleX, 0, 0, 0, scaleY, 0, 0, 0, 1)
 
         const rotRad = rot * (Math.PI / 180)
-        const cos = Math.cos(rotRad);
-        const sin = Math.sin(rotRad);
-        const rotation = new Matrix(
-          cos, -sin, 0,
-          sin,  cos, 0,
-          0,    0,   1
-        );
+        const cos = Math.cos(rotRad)
+        const sin = Math.sin(rotRad)
+        const rotation = new Matrix(cos, -sin, 0, sin, cos, 0, 0, 0, 1)
 
-        return translation.mulMat(scaling).mulMat(rotation);
+        return translation.mulMat(scaling).mulMat(rotation)
       }
 
       // Create a second canvas to draw an image onto
