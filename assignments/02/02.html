@@ -211,30 +211,102 @@
         function createPoints() {
             let points = [];
 
-            // TODO: Aufgabe a
+            // DONE: Aufgabe a
+            // cube with extra points
+            let coord_pool = [-0.5, -0.25, 0.0, 0.25, 0.5];
+            for (x of coord_pool) {
+                for (y of coord_pool) {
+                    for (z of coord_pool) {
+                        points.push(new Point(x,y,z));
+                    }
+                }
+            }
 
             return points;
         }
 
         let mouseRotMat = new Matrix();
 
+        function toRad(degrees) {
+            return degrees * Math.PI / 180
+        }
+
         function transform(points) {
             let modelViewMat = new Matrix();
 
-            // TODO: Aufgabe b
-
-            let projectionMat = new Matrix(
+            // DONE: Aufgabe b
+            let rotXMat = new Matrix(
+                1, 0, 0, 0,
+                0, Math.cos(toRad(rotX)), -Math.sin(toRad(rotX)), 0,
+                0, Math.sin(toRad(rotX)), Math.cos(toRad(rotX)), 0,
+                0, 0, 0, 1
+            );
+            let rotYMat = new Matrix(
+                Math.cos(toRad(rotY)), 0, Math.sin(toRad(rotY)), 0,
+                0, 1, 0, 0,
+                -Math.sin(toRad(rotY)), 0, Math.cos(toRad(rotY)), 0,
+                0, 0, 0, 1
+            );
+            let rotZMat = new Matrix(
+                Math.cos(toRad(rotZ)), -Math.sin(toRad(rotZ)), 0, 0,
+                Math.sin(toRad(rotZ)), Math.cos(toRad(rotZ)), 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            );
+            // r = (1,0,0)
+            // u = (0,1,0)
+            // d = (0,0,-1)
+            // c = (0,0,camZ)
+            let lookAtMat = new Matrix(
                 1, 0, 0, 0,
                 0, 1, 0, 0,
-                0, 0, 0, -1,
+                0, 0, 1, camZ,
                 0, 0, 0, 1
             );
 
-            // TODO: Aufgabe c
+            // combine into modelViewMat
+            modelViewMat = modelViewMat.mulMat(lookAtMat);
+            modelViewMat = modelViewMat.mulMat(rotZMat);
+            modelViewMat = modelViewMat.mulMat(rotYMat);
+            modelViewMat = modelViewMat.mulMat(rotXMat);
+
+            // DONE: Aufgabe c
+            // zentrum (0,0,0)
+            // bildebene z = -1
+            // TODO: not sure if this does what it's supposed to
+            // currently pushes the cube further back which feels correct
+            let moveNearPlaneMat = new Matrix(
+                1,0,0,0,
+                0,1,0,0,
+                0,0,1,1,
+                0,0,0,1
+            );
+
+            let projectionMat = new Matrix(
+                1,0,0,0,
+                0,1,0,0,
+                0,0,1,0,
+                0,0,-1,1
+            );
+
+            let scaleMat = new Matrix(
+                250,0,0,0,
+                0,250,0,0,
+                0,0,1,0,
+                0,0,0,1
+            );
+
+            let combined = new Matrix();
+            combined = combined.mulMat(scaleMat);
+            combined = combined.mulMat(projectionMat);
+            combined = combined.mulMat(moveNearPlaneMat);
+            combined = combined.mulMat(modelViewMat);
 
             let res = [];
             for (let i = 0; i < points.length; i++) {
-                let p = projectionMat.mulVec(points[i]);
+                let p = points[i]
+                p = combined.mulVec(p);
+                p.dehomogen();
                 res.push(p);
             }
             return res;
