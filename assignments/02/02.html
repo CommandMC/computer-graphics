@@ -219,16 +219,35 @@
         let mouseRotMat = new Matrix();
 
         function transform(points) {
-            let modelViewMat = new Matrix();
-
-            // TODO: Aufgabe b
-
-            let projectionMat = new Matrix(
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 0, -1,
-                0, 0, 0, 1
+            let rotX_rad = rotX * (Math.PI / 180);
+            let rotY_rad = rotY * (Math.PI / 180);
+            let rotZ_rad = rotZ * (Math.PI / 180);
+            let r_x = new Matrix(
+              1, 0, 0, 0,
+              0, Math.cos(rotX_rad), -Math.sin(rotX_rad), 0,
+              0, Math.sin(rotX_rad), Math.cos(rotX_rad), 0,
+              0, 0, 0, 1
             );
+            let r_y = new Matrix(
+              Math.cos(rotY_rad), 0, Math.sin(rotY_rad), 0,
+              0, 1, 0, 0,
+              -Math.sin(rotY_rad), 0, Math.cos(rotY_rad), 0,
+              0, 0, 0, 1
+            );
+            let r_z = new Matrix(
+              Math.cos(rotZ_rad), -Math.sin(rotZ_rad), 0, 0,
+              Math.sin(rotZ_rad), Math.cos(rotZ_rad), 0, 0,
+              0, 0, 1, 0,
+              0, 0, 0, 1
+            );
+            let lookAtMat = new Matrix(
+              1, 0, 0, 0,
+              0, 1, 0, 0,
+              0, 0, 1, -camZ,
+              0, 0, 0, 1
+            );
+            let modelViewMat = lookAtMat.mulMat(r_z.mulMat(r_y.mulMat(r_x)));
+
 
             // TODO: Aufgabe c
 
