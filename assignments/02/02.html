@@ -38,11 +38,25 @@
         <p>Kamera Z Position: <span id="camZOut"></span></p>
         <label for="camZIn"></label><input type="range" id="camZIn" min="2" max="10" step="0.01" class="slider">
     </div>
+    <div>
+        <p>Punkte pro Kante: <span id="edge_pointsOut"></span></p>
+        <label for="edge_pointsIn"></label><input type="range" id="edge_pointsIn" min="0" max="100" step="1" class="slider">
+    </div>
+    <div>
+        <label for="shapeMenu"><b>Figur:</b></label>
+        <select id="shapeMenu">
+            <option value="cube">Würfel</option>
+            <option value="pyramid">Pyramide</option>
+            <option value="tetrahedron">Tetraeder</option>
+            <option value="octahedron">Oktaeder</option>
+        </select>
+    </div>
     <script>
         let rotX = 0;
         let rotY = 0;
         let rotZ = 0;
         let camZ = 3;
+        let edge_points = 10;
 
         let rotXIn = document.getElementById("rotXIn");
         let rotXOut = document.getElementById("rotXOut");
@@ -78,6 +92,23 @@
         camZIn.oninput = function () {
             camZ = this.value;
             camZOut.innerHTML = camZ;
+            update();
+        };
+        let shapeMenu = document.getElementById("shapeMenu");
+        let shape = shapeMenu.value;
+        shapeMenu.oninput = function () {
+            shape = shapeMenu.value;
+            points = createPoints();
+            update();
+        }
+        let edge_pointsOut = document.getElementById("edge_pointsOut");
+        let edge_pointsIn = document.getElementById("edge_pointsIn");
+        edge_pointsIn.value = edge_points;
+        edge_pointsOut.innerHTML = edge_points;
+        edge_pointsIn.oninput = function () {
+            edge_points = parseInt(this.value);
+            edge_pointsOut.innerHTML = edge_points;
+            points = createPoints();
             update();
         };
 
@@ -208,11 +239,111 @@
             }
         }
 
+        function interpolateLine(vert1, vert2) {
+            let edge = [];
+            let dx = vert2.x - vert1.x;
+            let dy = vert2.y - vert1.y;
+            let dz = vert2.z - vert1.z;
+            let sx = dx/(edge_points+1);
+            let sy = dy/(edge_points+1);
+            let sz = dz/(edge_points+1);
+            for (let i = 1; i <= edge_points; i++) {
+                edge.push(new Point(vert1.x + i*sx, vert1.y + i*sy, vert1.z + i*sz));
+            }
+            return edge;
+        }
+
         function createPoints() {
-            let points = [
-              new Point(-1,-1,-1), new Point(1,-1,-1), new Point(-1,1,-1), new Point(1,1,-1),
-              new Point(-1,-1,1), new Point(1,-1,1), new Point(-1,1,1), new Point(1,1,1)
-            ];
+            let points = [];
+            switch (shape) {
+                case "pyramid":
+                    let Vert_A = new Point(-1,-1,-1);
+                    let Vert_B = new Point(1,-1,-1);
+                    let Vert_C = new Point(-1,-1,1);
+                    let Vert_D = new Point(1,-1,1);
+                    let Vert_E = new Point(0,1,0);
+                    points = [Vert_A, Vert_B, Vert_C, Vert_D, Vert_E];
+                    points.push(...interpolateLine(Vert_A,Vert_B));
+                    points.push(...interpolateLine(Vert_A,Vert_C));
+                    points.push(...interpolateLine(Vert_A,Vert_E));
+                    points.push(...interpolateLine(Vert_B,Vert_D));
+                    points.push(...interpolateLine(Vert_B,Vert_E));
+                    points.push(...interpolateLine(Vert_C,Vert_D));
+                    points.push(...interpolateLine(Vert_C,Vert_E));
+                    points.push(...interpolateLine(Vert_D,Vert_E));
+                    break;
+
+                case "cube":
+                    // 8 corners of the cube
+                    let cA = new Point(-1, -1, -1);
+                    let cB = new Point(1, -1, -1);
+                    let cC = new Point(1, -1, 1);
+                    let cD = new Point(-1, -1, 1);
+                    let cE = new Point(-1, 1, -1);
+                    let cF = new Point(1, 1, -1);
+                    let cG = new Point(1, 1, 1);
+                    let cH = new Point(-1, 1, 1);
+                    points = [cA,cB,cC,cD,cE,cF,cG,cH];
+
+                    // Bottom face
+                    points.push(...interpolateLine(cA, cB));
+                    points.push(...interpolateLine(cB, cC));
+                    points.push(...interpolateLine(cC, cD));
+                    points.push(...interpolateLine(cD, cA));
+                    // Top face
+                    points.push(...interpolateLine(cE, cF));
+                    points.push(...interpolateLine(cF, cG));
+                    points.push(...interpolateLine(cG, cH));
+                    points.push(...interpolateLine(cH, cE));
+                    // Vertical edges
+                    points.push(...interpolateLine(cA, cE));
+                    points.push(...interpolateLine(cB, cF));
+                    points.push(...interpolateLine(cC, cG));
+                    points.push(...interpolateLine(cD, cH));
+                    break;
+
+                case "tetrahedron":
+                    // Regular tetrahedron, centered at the origin
+                    let tA = new Point(1, 1, 1);
+                    let tB = new Point(-1, -1, 1);
+                    let tC = new Point(-1, 1, -1);
+                    let tD = new Point(1, -1, -1);
+                    points = [tA, tB, tC, tD];
+
+                    points.push(...interpolateLine(tA, tB));
+                    points.push(...interpolateLine(tA, tC));
+                    points.push(...interpolateLine(tA, tD));
+                    points.push(...interpolateLine(tB, tC));
+                    points.push(...interpolateLine(tB, tD));
+                    points.push(...interpolateLine(tC, tD));
+                    break;
+
+                case "octahedron":
+                    // Octahedron vertices (centered at origin)
+                    let oA = new Point(1, 0, 0);
+                    let oB = new Point(-1, 0, 0);
+                    let oC = new Point(0, 1, 0);
+                    let oD = new Point(0, -1, 0);
+                    let oE = new Point(0, 0, 1);
+                    let oF = new Point(0, 0, -1);
+                    points = [oA,oB,oC,oD,oE,oF];
+
+                    points.push(...interpolateLine(oA, oC));
+                    points.push(...interpolateLine(oA, oD));
+                    points.push(...interpolateLine(oA, oE));
+                    points.push(...interpolateLine(oA, oF));
+                    points.push(...interpolateLine(oB, oC));
+                    points.push(...interpolateLine(oB, oD));
+                    points.push(...interpolateLine(oB, oE));
+                    points.push(...interpolateLine(oB, oF));
+                    points.push(...interpolateLine(oC, oE));
+                    points.push(...interpolateLine(oC, oF));
+                    points.push(...interpolateLine(oD, oE));
+                    points.push(...interpolateLine(oD, oF));
+                    break;
+
+              // Add more shapes if needed!
+            }
             return points;
         }
 
