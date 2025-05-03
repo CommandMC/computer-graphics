@@ -249,11 +249,26 @@
             let modelViewMat = lookAtMat.mulMat(r_z.mulMat(r_y.mulMat(r_x)));
 
 
-            // TODO: Aufgabe c
+            let perspectiveMat = new Matrix(
+              1, 0, 0, 0,
+              0, 1, 0, 0,
+              0, 0, 1, 0,
+              0, 0, 1/(camZ-1), 0
+            );
+
+            let scaleMat = new Matrix(
+              250, 0, 0, 0,
+              0, 250, 0, 0,
+              0, 0, 1, 0,
+              0, 0, -1, 0
+            );
+
+            let projectionMat = scaleMat.mulMat(perspectiveMat.mulMat(modelViewMat));
 
             let res = [];
             for (let i = 0; i < points.length; i++) {
                 let p = projectionMat.mulVec(points[i]);
+                p.dehomogen();
                 res.push(p);
             }
             return res;
