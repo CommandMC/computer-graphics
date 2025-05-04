@@ -375,8 +375,7 @@
               0, 0, 1, -camZ,
               0, 0, 0, 1
             );
-            let modelViewMat = lookAtMat.mulMat(r_z.mulMat(r_y.mulMat(r_x)));
-
+            let modelViewMat = lookAtMat.mulMat(mouseRotMat.mulMat(r_z.mulMat(r_y.mulMat(r_x))));
 
             let perspectiveMat = new Matrix(
               1, 0, 0, 0,
@@ -422,13 +421,30 @@
             y0 = 250 - event.clientY;
         });
 
+        let mx_rad = 0;
+        let my_rad = 0;
+
         document.getElementById("canvas").addEventListener("mousemove", function (event) {
             if (down) {
                 let x1 = event.clientX - 250;
                 let y1 = 250 - event.clientY;
                 if (x0 !== x1 || y0 !== y1) {
+                    mx_rad += (y1-y0)/159.1549427671505
+                    my_rad += (x1-x0)/159.1549427671505
+                    let mr_x = new Matrix(
+                      1, 0, 0, 0,
+                      0, Math.cos(mx_rad), -Math.sin(mx_rad), 0,
+                      0, Math.sin(mx_rad), Math.cos(mx_rad), 0,
+                      0, 0, 0, 1
+                    );
+                    let mr_y = new Matrix(
+                      Math.cos(my_rad), 0, Math.sin(my_rad), 0,
+                      0, 1, 0, 0,
+                      -Math.sin(my_rad), 0, Math.cos(my_rad), 0,
+                      0, 0, 0, 1
+                    );
 
-                    // Bonusaufgabe
+                    mouseRotMat = mr_y.mulMat(mr_x);
 
                     update();
                     x0 = x1;
@@ -437,6 +453,7 @@
             }
         });
 
+        // use mousewheel to adjust camZ
         document.getElementById("canvas").addEventListener("wheel", function (event) {
             const delta = Math.sign(event.deltaY);
             console.info(delta);
