@@ -90,7 +90,7 @@
         camZIn.value = camZ;
         camZOut.innerHTML = camZ;
         camZIn.oninput = function () {
-            camZ = this.value;
+            camZ = parseInt(this.value);
             camZOut.innerHTML = camZ;
             update();
         };
@@ -341,8 +341,6 @@
                     points.push(...interpolateLine(oD, oE));
                     points.push(...interpolateLine(oD, oF));
                     break;
-
-              // Add more shapes if needed!
             }
             return points;
         }
@@ -436,6 +434,23 @@
                     x0 = x1;
                     y0 = y1;
                 }
+            }
+        });
+
+        document.getElementById("canvas").addEventListener("wheel", function (event) {
+            const delta = Math.sign(event.deltaY);
+            console.info(delta);
+            if (delta === 1 && camZ <= 9.9) {
+                camZ += 0.1;
+                camZ = Math.round(camZ * 10) / 10;
+                camZOut.innerHTML = camZ;
+                update();
+            } else if (delta === -1 && camZ >= 2.1) {
+                camZ -= 0.1;
+                camZ = Math.round(camZ * 10) / 10;
+                camZOut.innerHTML = camZ;
+                update();
+
             }
         });
 
