@@ -429,7 +429,7 @@
                 let x1 = event.clientX - 250;
                 let y1 = 250 - event.clientY;
                 if (x0 !== x1 || y0 !== y1) {
-                    mx_rad += (y1-y0)/159.1549427671505
+                    mx_rad += -(y1-y0)/159.1549427671505
                     my_rad += (x1-x0)/159.1549427671505
                     let mr_x = new Matrix(
                       1, 0, 0, 0,
