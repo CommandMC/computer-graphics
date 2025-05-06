@@ -1,481 +1,528 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Assignment 2</title>
     <style>
-        .slider {
-            width: 500px;
-            height: 10px;
-        }
+      .slider {
+        width: 500px;
+        height: 10px;
+      }
 
-        #canvas {
-            float: left;
-            margin-right: 1em;
-        }
-
+      #canvas {
+        float: left;
+        margin-right: 1em;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <canvas id="canvas" width="500" height="500" style="border:1px solid #000000;">
-        Your browser does not support the HTML5 canvas tag.
+  <body>
+    <canvas id="canvas" width="500" height="500" style="border: 1px solid #000000">
+      Your browser does not support the HTML5 canvas tag.
     </canvas>
     <div>
-        <p>Rotation X: <span id="rotXOut"></span></p>
-        <label for="rotXIn"></label><input type="range" id="rotXIn" min="-180" max="180" class="slider">
+      <p>Rotation X: <span id="rotXOut"></span></p>
+      <label for="rotXIn"></label><input type="range" id="rotXIn" min="-180" max="180" class="slider" />
     </div>
     <div>
-        <p>Rotation Y: <span id="rotYOut"></span></p>
-        <label for="rotYIn"></label><input type="range" id="rotYIn" min="-180" max="180" class="slider">
+      <p>Rotation Y: <span id="rotYOut"></span></p>
+      <label for="rotYIn"></label><input type="range" id="rotYIn" min="-180" max="180" class="slider" />
     </div>
     <div>
-        <p>Rotation Z: <span id="rotZOut"></span></p>
-        <label for="rotZIn"></label><input type="range" id="rotZIn" min="-180" max="180" class="slider">
+      <p>Rotation Z: <span id="rotZOut"></span></p>
+      <label for="rotZIn"></label><input type="range" id="rotZIn" min="-180" max="180" class="slider" />
     </div>
     <div>
-        <p>Kamera Z Position: <span id="camZOut"></span></p>
-        <label for="camZIn"></label><input type="range" id="camZIn" min="2" max="10" step="0.01" class="slider">
+      <p>Kamera Z Position: <span id="camZOut"></span></p>
+      <label for="camZIn"></label><input type="range" id="camZIn" min="2" max="10" step="0.01" class="slider" />
     </div>
     <div>
-        <p>Punkte pro Kante: <span id="edge_pointsOut"></span></p>
-        <label for="edge_pointsIn"></label><input type="range" id="edge_pointsIn" min="0" max="100" step="1" class="slider">
+      <p>Punkte pro Kante: <span id="edge_pointsOut"></span></p>
+      <label for="edge_pointsIn"></label
+      ><input type="range" id="edge_pointsIn" min="0" max="100" step="1" class="slider" />
     </div>
     <div>
-        <label for="shapeMenu"><b>Figur:</b></label>
-        <select id="shapeMenu">
-            <option value="cube">Würfel</option>
-            <option value="pyramid">Pyramide</option>
-            <option value="tetrahedron">Tetraeder</option>
-            <option value="octahedron">Oktaeder</option>
-        </select>
+      <label for="shapeMenu"><b>Figur:</b></label>
+      <select id="shapeMenu">
+        <option value="cube">Würfel</option>
+        <option value="pyramid">Pyramide</option>
+        <option value="tetrahedron">Tetraeder</option>
+        <option value="octahedron">Oktaeder</option>
+      </select>
     </div>
     <script>
-        let rotX = 0;
-        let rotY = 0;
-        let rotZ = 0;
-        let camZ = 3;
-        let edge_points = 10;
+      let rotX = 0
+      let rotY = 0
+      let rotZ = 0
+      let camZ = 3
+      let edge_points = 10
 
-        let rotXIn = document.getElementById("rotXIn");
-        let rotXOut = document.getElementById("rotXOut");
-        rotXIn.value = rotX;
-        rotXOut.innerHTML = rotX;
-        rotXIn.oninput = function () {
-            rotX = this.value;
-            rotXOut.innerHTML = rotX;
-            update();
-        };
-        let rotYIn = document.getElementById("rotYIn");
-        let rotYOut = document.getElementById("rotYOut");
-        rotYIn.value = rotY;
-        rotYOut.innerHTML = rotY;
-        rotYIn.oninput = function () {
-            rotY = this.value;
-            rotYOut.innerHTML = rotY;
-            update();
-        };
-        let rotZIn = document.getElementById("rotZIn");
-        let rotZOut = document.getElementById("rotZOut");
-        rotZIn.value = rotZ;
-        rotZOut.innerHTML = rotZ;
-        rotZIn.oninput = function () {
-            rotZ = this.value;
-            rotZOut.innerHTML = rotZ;
-            update();
-        };
-        let camZIn = document.getElementById("camZIn");
-        let camZOut = document.getElementById("camZOut");
-        camZIn.value = camZ;
-        camZOut.innerHTML = camZ;
-        camZIn.oninput = function () {
-            camZ = parseInt(this.value);
-            camZOut.innerHTML = camZ;
-            update();
-        };
-        let shapeMenu = document.getElementById("shapeMenu");
-        let shape = shapeMenu.value;
-        shapeMenu.oninput = function () {
-            shape = shapeMenu.value;
-            points = createPoints();
-            update();
-        }
-        let edge_pointsOut = document.getElementById("edge_pointsOut");
-        let edge_pointsIn = document.getElementById("edge_pointsIn");
-        edge_pointsIn.value = edge_points;
-        edge_pointsOut.innerHTML = edge_points;
-        edge_pointsIn.oninput = function () {
-            edge_points = parseInt(this.value);
-            edge_pointsOut.innerHTML = edge_points;
-            points = createPoints();
-            update();
-        };
+      let rotXIn = document.getElementById('rotXIn')
+      let rotXOut = document.getElementById('rotXOut')
+      rotXIn.value = rotX
+      rotXOut.innerHTML = rotX
+      rotXIn.oninput = function () {
+        rotX = this.value
+        rotXOut.innerHTML = rotX
+        update()
+      }
+      let rotYIn = document.getElementById('rotYIn')
+      let rotYOut = document.getElementById('rotYOut')
+      rotYIn.value = rotY
+      rotYOut.innerHTML = rotY
+      rotYIn.oninput = function () {
+        rotY = this.value
+        rotYOut.innerHTML = rotY
+        update()
+      }
+      let rotZIn = document.getElementById('rotZIn')
+      let rotZOut = document.getElementById('rotZOut')
+      rotZIn.value = rotZ
+      rotZOut.innerHTML = rotZ
+      rotZIn.oninput = function () {
+        rotZ = this.value
+        rotZOut.innerHTML = rotZ
+        update()
+      }
+      let camZIn = document.getElementById('camZIn')
+      let camZOut = document.getElementById('camZOut')
+      camZIn.value = camZ
+      camZOut.innerHTML = camZ
+      camZIn.oninput = function () {
+        camZ = parseInt(this.value)
+        camZOut.innerHTML = camZ
+        update()
+      }
+      let shapeMenu = document.getElementById('shapeMenu')
+      let shape = shapeMenu.value
+      shapeMenu.oninput = function () {
+        shape = shapeMenu.value
+        points = createPoints()
+        update()
+      }
+      let edge_pointsOut = document.getElementById('edge_pointsOut')
+      let edge_pointsIn = document.getElementById('edge_pointsIn')
+      edge_pointsIn.value = edge_points
+      edge_pointsOut.innerHTML = edge_points
+      edge_pointsIn.oninput = function () {
+        edge_points = parseInt(this.value)
+        edge_pointsOut.innerHTML = edge_points
+        points = createPoints()
+        update()
+      }
 
-        class Vector {
-            constructor(x = 0, y = 0, z = 0) {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                this.w = 0;
-            }
-
-            dot(v) {
-                return this.x * v.x + this.y * v.y + this.z * v.z;
-            }
-
-            cross(v) {
-                return new Vector(
-                    this.y * v.z - this.z * v.y,
-                    this.z * v.x - this.x * v.z,
-                    this.x * v.y - this.y * v.x
-                );
-            }
-
-            norm() {
-                return Math.sqrt(this.dot(this));
-            }
-
-            normalize() {
-                let n = this.norm();
-                this.x /= n;
-                this.y /= n;
-                this.z /= n;
-            }
-
-            sub(v) {
-                return new Vector(
-                    this.x - v.x,
-                    this.y - v.y,
-                    this.z - v.z
-                );
-            }
+      class Vector {
+        constructor(x = 0, y = 0, z = 0) {
+          this.x = x
+          this.y = y
+          this.z = z
+          this.w = 0
         }
 
-        class Point {
-            constructor(x = 0, y = 0, z = 0, w = 1) {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                this.w = w;
-            }
-
-            dehomogen() {
-                this.x /= this.w;
-                this.y /= this.w;
-                this.z /= this.w;
-                this.w = 1;
-            }
+        dot(v) {
+          return this.x * v.x + this.y * v.y + this.z * v.z
         }
 
-        class Matrix {
-            constructor(a00 = 1, a01 = 0, a02 = 0, a03 = 0,
-                a10 = 0, a11 = 1, a12 = 0, a13 = 0,
-                a20 = 0, a21 = 0, a22 = 1, a23 = 0,
-                a30 = 0, a31 = 0, a32 = 0, a33 = 1) {
-                this.a00 = a00;
-                this.a01 = a01;
-                this.a02 = a02;
-                this.a03 = a03;
-                this.a10 = a10;
-                this.a11 = a11;
-                this.a12 = a12;
-                this.a13 = a13;
-                this.a20 = a20;
-                this.a21 = a21;
-                this.a22 = a22;
-                this.a23 = a23;
-                this.a30 = a30;
-                this.a31 = a31;
-                this.a32 = a32;
-                this.a33 = a33;
-            }
-
-            mulMat(m) {
-                return new Matrix(
-                    this.a00 * m.a00 + this.a01 * m.a10 + this.a02 * m.a20 + this.a03 * m.a30,
-                    this.a00 * m.a01 + this.a01 * m.a11 + this.a02 * m.a21 + this.a03 * m.a31,
-                    this.a00 * m.a02 + this.a01 * m.a12 + this.a02 * m.a22 + this.a03 * m.a32,
-                    this.a00 * m.a03 + this.a01 * m.a13 + this.a02 * m.a23 + this.a03 * m.a33,
-                    this.a10 * m.a00 + this.a11 * m.a10 + this.a12 * m.a20 + this.a13 * m.a30,
-                    this.a10 * m.a01 + this.a11 * m.a11 + this.a12 * m.a21 + this.a13 * m.a31,
-                    this.a10 * m.a02 + this.a11 * m.a12 + this.a12 * m.a22 + this.a13 * m.a32,
-                    this.a10 * m.a03 + this.a11 * m.a13 + this.a12 * m.a23 + this.a13 * m.a33,
-                    this.a20 * m.a00 + this.a21 * m.a10 + this.a22 * m.a20 + this.a23 * m.a30,
-                    this.a20 * m.a01 + this.a21 * m.a11 + this.a22 * m.a21 + this.a23 * m.a31,
-                    this.a20 * m.a02 + this.a21 * m.a12 + this.a22 * m.a22 + this.a23 * m.a32,
-                    this.a20 * m.a03 + this.a21 * m.a13 + this.a22 * m.a23 + this.a23 * m.a33,
-                    this.a30 * m.a00 + this.a31 * m.a10 + this.a32 * m.a20 + this.a33 * m.a30,
-                    this.a30 * m.a01 + this.a31 * m.a11 + this.a32 * m.a21 + this.a33 * m.a31,
-                    this.a30 * m.a02 + this.a31 * m.a12 + this.a32 * m.a22 + this.a33 * m.a32,
-                    this.a30 * m.a03 + this.a31 * m.a13 + this.a32 * m.a23 + this.a33 * m.a33
-                );
-            }
-
-            mulVec(v) {
-                return new Point(
-                    this.a00 * v.x + this.a01 * v.y + this.a02 * v.z + this.a03 * v.w,
-                    this.a10 * v.x + this.a11 * v.y + this.a12 * v.z + this.a13 * v.w,
-                    this.a20 * v.x + this.a21 * v.y + this.a22 * v.z + this.a23 * v.w,
-                    this.a30 * v.x + this.a31 * v.y + this.a32 * v.z + this.a33 * v.w
-                );
-            }
+        cross(v) {
+          return new Vector(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x)
         }
 
-        const canvas = document.getElementById("canvas");
-        const offset = 250;
-        const ctx = canvas.getContext("2d");
-
-        function drawPoint(x, y) {
-            ctx.beginPath();
-            ctx.arc(x + offset, -y + offset, 2, 0, 2 * Math.PI, false);
-            ctx.fillStyle = '#000000';
-            ctx.fill();
+        norm() {
+          return Math.sqrt(this.dot(this))
         }
 
-        function drawPoints(points) {
-            for (let i = 0; i < points.length; i++) {
-                drawPoint(points[i].x, points[i].y);
-            }
+        normalize() {
+          let n = this.norm()
+          this.x /= n
+          this.y /= n
+          this.z /= n
         }
 
-        function interpolateLine(vert1, vert2) {
-            let edge = [];
-            let dx = vert2.x - vert1.x;
-            let dy = vert2.y - vert1.y;
-            let dz = vert2.z - vert1.z;
-            let sx = dx/(edge_points+1);
-            let sy = dy/(edge_points+1);
-            let sz = dz/(edge_points+1);
-            for (let i = 1; i <= edge_points; i++) {
-                edge.push(new Point(vert1.x + i*sx, vert1.y + i*sy, vert1.z + i*sz));
-            }
-            return edge;
+        sub(v) {
+          return new Vector(this.x - v.x, this.y - v.y, this.z - v.z)
+        }
+      }
+
+      class Point {
+        constructor(x = 0, y = 0, z = 0, w = 1) {
+          this.x = x
+          this.y = y
+          this.z = z
+          this.w = w
         }
 
-        function createPoints() {
-            let points = [];
-            switch (shape) {
-                case "pyramid":
-                    let Vert_A = new Point(-1,-1,-1);
-                    let Vert_B = new Point(1,-1,-1);
-                    let Vert_C = new Point(-1,-1,1);
-                    let Vert_D = new Point(1,-1,1);
-                    let Vert_E = new Point(0,1,0);
-                    points = [Vert_A, Vert_B, Vert_C, Vert_D, Vert_E];
-                    points.push(...interpolateLine(Vert_A,Vert_B));
-                    points.push(...interpolateLine(Vert_A,Vert_C));
-                    points.push(...interpolateLine(Vert_A,Vert_E));
-                    points.push(...interpolateLine(Vert_B,Vert_D));
-                    points.push(...interpolateLine(Vert_B,Vert_E));
-                    points.push(...interpolateLine(Vert_C,Vert_D));
-                    points.push(...interpolateLine(Vert_C,Vert_E));
-                    points.push(...interpolateLine(Vert_D,Vert_E));
-                    break;
+        dehomogen() {
+          this.x /= this.w
+          this.y /= this.w
+          this.z /= this.w
+          this.w = 1
+        }
+      }
 
-                case "cube":
-                    // 8 corners of the cube
-                    let cA = new Point(-1, -1, -1);
-                    let cB = new Point(1, -1, -1);
-                    let cC = new Point(1, -1, 1);
-                    let cD = new Point(-1, -1, 1);
-                    let cE = new Point(-1, 1, -1);
-                    let cF = new Point(1, 1, -1);
-                    let cG = new Point(1, 1, 1);
-                    let cH = new Point(-1, 1, 1);
-                    points = [cA,cB,cC,cD,cE,cF,cG,cH];
-
-                    // Bottom face
-                    points.push(...interpolateLine(cA, cB));
-                    points.push(...interpolateLine(cB, cC));
-                    points.push(...interpolateLine(cC, cD));
-                    points.push(...interpolateLine(cD, cA));
-                    // Top face
-                    points.push(...interpolateLine(cE, cF));
-                    points.push(...interpolateLine(cF, cG));
-                    points.push(...interpolateLine(cG, cH));
-                    points.push(...interpolateLine(cH, cE));
-                    // Vertical edges
-                    points.push(...interpolateLine(cA, cE));
-                    points.push(...interpolateLine(cB, cF));
-                    points.push(...interpolateLine(cC, cG));
-                    points.push(...interpolateLine(cD, cH));
-                    break;
-
-                case "tetrahedron":
-                    // Regular tetrahedron, centered at the origin
-                    let tA = new Point(1, 1, 1);
-                    let tB = new Point(-1, -1, 1);
-                    let tC = new Point(-1, 1, -1);
-                    let tD = new Point(1, -1, -1);
-                    points = [tA, tB, tC, tD];
-
-                    points.push(...interpolateLine(tA, tB));
-                    points.push(...interpolateLine(tA, tC));
-                    points.push(...interpolateLine(tA, tD));
-                    points.push(...interpolateLine(tB, tC));
-                    points.push(...interpolateLine(tB, tD));
-                    points.push(...interpolateLine(tC, tD));
-                    break;
-
-                case "octahedron":
-                    // Octahedron vertices (centered at origin)
-                    let oA = new Point(1, 0, 0);
-                    let oB = new Point(-1, 0, 0);
-                    let oC = new Point(0, 1, 0);
-                    let oD = new Point(0, -1, 0);
-                    let oE = new Point(0, 0, 1);
-                    let oF = new Point(0, 0, -1);
-                    points = [oA,oB,oC,oD,oE,oF];
-
-                    points.push(...interpolateLine(oA, oC));
-                    points.push(...interpolateLine(oA, oD));
-                    points.push(...interpolateLine(oA, oE));
-                    points.push(...interpolateLine(oA, oF));
-                    points.push(...interpolateLine(oB, oC));
-                    points.push(...interpolateLine(oB, oD));
-                    points.push(...interpolateLine(oB, oE));
-                    points.push(...interpolateLine(oB, oF));
-                    points.push(...interpolateLine(oC, oE));
-                    points.push(...interpolateLine(oC, oF));
-                    points.push(...interpolateLine(oD, oE));
-                    points.push(...interpolateLine(oD, oF));
-                    break;
-            }
-            return points;
+      class Matrix {
+        constructor(
+          a00 = 1,
+          a01 = 0,
+          a02 = 0,
+          a03 = 0,
+          a10 = 0,
+          a11 = 1,
+          a12 = 0,
+          a13 = 0,
+          a20 = 0,
+          a21 = 0,
+          a22 = 1,
+          a23 = 0,
+          a30 = 0,
+          a31 = 0,
+          a32 = 0,
+          a33 = 1
+        ) {
+          this.a00 = a00
+          this.a01 = a01
+          this.a02 = a02
+          this.a03 = a03
+          this.a10 = a10
+          this.a11 = a11
+          this.a12 = a12
+          this.a13 = a13
+          this.a20 = a20
+          this.a21 = a21
+          this.a22 = a22
+          this.a23 = a23
+          this.a30 = a30
+          this.a31 = a31
+          this.a32 = a32
+          this.a33 = a33
         }
 
-        let mouseRotMat = new Matrix();
-
-        function transform(points) {
-            let rotX_rad = rotX * (Math.PI / 180);
-            let rotY_rad = rotY * (Math.PI / 180);
-            let rotZ_rad = rotZ * (Math.PI / 180);
-            let r_x = new Matrix(
-              1, 0, 0, 0,
-              0, Math.cos(rotX_rad), -Math.sin(rotX_rad), 0,
-              0, Math.sin(rotX_rad), Math.cos(rotX_rad), 0,
-              0, 0, 0, 1
-            );
-            let r_y = new Matrix(
-              Math.cos(rotY_rad), 0, Math.sin(rotY_rad), 0,
-              0, 1, 0, 0,
-              -Math.sin(rotY_rad), 0, Math.cos(rotY_rad), 0,
-              0, 0, 0, 1
-            );
-            let r_z = new Matrix(
-              Math.cos(rotZ_rad), -Math.sin(rotZ_rad), 0, 0,
-              Math.sin(rotZ_rad), Math.cos(rotZ_rad), 0, 0,
-              0, 0, 1, 0,
-              0, 0, 0, 1
-            );
-            let lookAtMat = new Matrix(
-              1, 0, 0, 0,
-              0, 1, 0, 0,
-              0, 0, 1, -camZ,
-              0, 0, 0, 1
-            );
-            let modelViewMat = lookAtMat.mulMat(mouseRotMat.mulMat(r_z.mulMat(r_y.mulMat(r_x))));
-
-            let perspectiveMat = new Matrix(
-              1, 0, 0, 0,
-              0, 1, 0, 0,
-              0, 0, 1, 0,
-              0, 0, 1/(camZ-1), 0
-            );
-
-            let scaleMat = new Matrix(
-              250, 0, 0, 0,
-              0, 250, 0, 0,
-              0, 0, 1, 0,
-              0, 0, -1, 0
-            );
-
-            let projectionMat = scaleMat.mulMat(perspectiveMat.mulMat(modelViewMat));
-
-            let res = [];
-            for (let i = 0; i < points.length; i++) {
-                let p = projectionMat.mulVec(points[i]);
-                p.dehomogen();
-                res.push(p);
-            }
-            return res;
+        mulMat(m) {
+          return new Matrix(
+            this.a00 * m.a00 + this.a01 * m.a10 + this.a02 * m.a20 + this.a03 * m.a30,
+            this.a00 * m.a01 + this.a01 * m.a11 + this.a02 * m.a21 + this.a03 * m.a31,
+            this.a00 * m.a02 + this.a01 * m.a12 + this.a02 * m.a22 + this.a03 * m.a32,
+            this.a00 * m.a03 + this.a01 * m.a13 + this.a02 * m.a23 + this.a03 * m.a33,
+            this.a10 * m.a00 + this.a11 * m.a10 + this.a12 * m.a20 + this.a13 * m.a30,
+            this.a10 * m.a01 + this.a11 * m.a11 + this.a12 * m.a21 + this.a13 * m.a31,
+            this.a10 * m.a02 + this.a11 * m.a12 + this.a12 * m.a22 + this.a13 * m.a32,
+            this.a10 * m.a03 + this.a11 * m.a13 + this.a12 * m.a23 + this.a13 * m.a33,
+            this.a20 * m.a00 + this.a21 * m.a10 + this.a22 * m.a20 + this.a23 * m.a30,
+            this.a20 * m.a01 + this.a21 * m.a11 + this.a22 * m.a21 + this.a23 * m.a31,
+            this.a20 * m.a02 + this.a21 * m.a12 + this.a22 * m.a22 + this.a23 * m.a32,
+            this.a20 * m.a03 + this.a21 * m.a13 + this.a22 * m.a23 + this.a23 * m.a33,
+            this.a30 * m.a00 + this.a31 * m.a10 + this.a32 * m.a20 + this.a33 * m.a30,
+            this.a30 * m.a01 + this.a31 * m.a11 + this.a32 * m.a21 + this.a33 * m.a31,
+            this.a30 * m.a02 + this.a31 * m.a12 + this.a32 * m.a22 + this.a33 * m.a32,
+            this.a30 * m.a03 + this.a31 * m.a13 + this.a32 * m.a23 + this.a33 * m.a33
+          )
         }
 
-        points = createPoints();
-
-        function update() {
-            ctx.clearRect(0, 0, 500, 500);
-            drawPoints(transform(points));
+        mulVec(v) {
+          return new Point(
+            this.a00 * v.x + this.a01 * v.y + this.a02 * v.z + this.a03 * v.w,
+            this.a10 * v.x + this.a11 * v.y + this.a12 * v.z + this.a13 * v.w,
+            this.a20 * v.x + this.a21 * v.y + this.a22 * v.z + this.a23 * v.w,
+            this.a30 * v.x + this.a31 * v.y + this.a32 * v.z + this.a33 * v.w
+          )
         }
+      }
 
-        update();
+      const canvas = document.getElementById('canvas')
+      const offset = 250
+      const ctx = canvas.getContext('2d')
 
-        let down = false;
-        let x0;
-        let y0;
+      function drawPoint(x, y) {
+        ctx.beginPath()
+        ctx.arc(x + offset, -y + offset, 2, 0, 2 * Math.PI, false)
+        ctx.fillStyle = '#000000'
+        ctx.fill()
+      }
 
-        document.getElementById("canvas").addEventListener("mousedown", function (event) {
-            down = true;
-            x0 = event.clientX - 250;
-            y0 = 250 - event.clientY;
-        });
+      function drawPoints(points) {
+        for (let i = 0; i < points.length; i++) {
+          drawPoint(points[i].x, points[i].y)
+        }
+      }
 
-        let mx_rad = 0;
-        let my_rad = 0;
+      function interpolateLine(vert1, vert2) {
+        let edge = []
+        let dx = vert2.x - vert1.x
+        let dy = vert2.y - vert1.y
+        let dz = vert2.z - vert1.z
+        let sx = dx / (edge_points + 1)
+        let sy = dy / (edge_points + 1)
+        let sz = dz / (edge_points + 1)
+        for (let i = 1; i <= edge_points; i++) {
+          edge.push(new Point(vert1.x + i * sx, vert1.y + i * sy, vert1.z + i * sz))
+        }
+        return edge
+      }
 
-        document.getElementById("canvas").addEventListener("mousemove", function (event) {
-            if (down) {
-                let x1 = event.clientX - 250;
-                let y1 = 250 - event.clientY;
-                if (x0 !== x1 || y0 !== y1) {
-                    mx_rad = -(y1-y0)/159.1549427671505
-                    my_rad = (x1-x0)/159.1549427671505
-                    let mr_x = new Matrix(
-                      1, 0, 0, 0,
-                      0, Math.cos(mx_rad), -Math.sin(mx_rad), 0,
-                      0, Math.sin(mx_rad), Math.cos(mx_rad), 0,
-                      0, 0, 0, 1
-                    );
-                    let mr_y = new Matrix(
-                      Math.cos(my_rad), 0, Math.sin(my_rad), 0,
-                      0, 1, 0, 0,
-                      -Math.sin(my_rad), 0, Math.cos(my_rad), 0,
-                      0, 0, 0, 1
-                    );
+      function createPoints() {
+        let points = []
+        switch (shape) {
+          case 'pyramid':
+            let Vert_A = new Point(-1, -1, -1)
+            let Vert_B = new Point(1, -1, -1)
+            let Vert_C = new Point(-1, -1, 1)
+            let Vert_D = new Point(1, -1, 1)
+            let Vert_E = new Point(0, 1, 0)
+            points = [Vert_A, Vert_B, Vert_C, Vert_D, Vert_E]
+            points.push(...interpolateLine(Vert_A, Vert_B))
+            points.push(...interpolateLine(Vert_A, Vert_C))
+            points.push(...interpolateLine(Vert_A, Vert_E))
+            points.push(...interpolateLine(Vert_B, Vert_D))
+            points.push(...interpolateLine(Vert_B, Vert_E))
+            points.push(...interpolateLine(Vert_C, Vert_D))
+            points.push(...interpolateLine(Vert_C, Vert_E))
+            points.push(...interpolateLine(Vert_D, Vert_E))
+            break
 
-                    mouseRotMat = mr_y.mulMat(mr_x.mulMat(mouseRotMat));
+          case 'cube':
+            // 8 corners of the cube
+            let cA = new Point(-1, -1, -1)
+            let cB = new Point(1, -1, -1)
+            let cC = new Point(1, -1, 1)
+            let cD = new Point(-1, -1, 1)
+            let cE = new Point(-1, 1, -1)
+            let cF = new Point(1, 1, -1)
+            let cG = new Point(1, 1, 1)
+            let cH = new Point(-1, 1, 1)
+            points = [cA, cB, cC, cD, cE, cF, cG, cH]
 
-                    update();
-                    x0 = x1;
-                    y0 = y1;
-                }
-            }
-        });
+            // Bottom face
+            points.push(...interpolateLine(cA, cB))
+            points.push(...interpolateLine(cB, cC))
+            points.push(...interpolateLine(cC, cD))
+            points.push(...interpolateLine(cD, cA))
+            // Top face
+            points.push(...interpolateLine(cE, cF))
+            points.push(...interpolateLine(cF, cG))
+            points.push(...interpolateLine(cG, cH))
+            points.push(...interpolateLine(cH, cE))
+            // Vertical edges
+            points.push(...interpolateLine(cA, cE))
+            points.push(...interpolateLine(cB, cF))
+            points.push(...interpolateLine(cC, cG))
+            points.push(...interpolateLine(cD, cH))
+            break
 
-        // use mousewheel to adjust camZ
-        document.getElementById("canvas").addEventListener("wheel", function (event) {
-            const delta = Math.sign(event.deltaY);
-            console.info(delta);
-            if (delta === 1 && camZ <= 9.9) {
-                camZ += 0.1;
-                camZ = Math.round(camZ * 10) / 10;
-                camZOut.innerHTML = camZ;
-                update();
-            } else if (delta === -1 && camZ >= 2.1) {
-                camZ -= 0.1;
-                camZ = Math.round(camZ * 10) / 10;
-                camZOut.innerHTML = camZ;
-                update();
+          case 'tetrahedron':
+            // Regular tetrahedron, centered at the origin
+            let tA = new Point(1, 1, 1)
+            let tB = new Point(-1, -1, 1)
+            let tC = new Point(-1, 1, -1)
+            let tD = new Point(1, -1, -1)
+            points = [tA, tB, tC, tD]
 
-            }
-        });
+            points.push(...interpolateLine(tA, tB))
+            points.push(...interpolateLine(tA, tC))
+            points.push(...interpolateLine(tA, tD))
+            points.push(...interpolateLine(tB, tC))
+            points.push(...interpolateLine(tB, tD))
+            points.push(...interpolateLine(tC, tD))
+            break
 
-        document.getElementById("canvas").addEventListener("mouseup", function () {
-            down = false;
-        });
+          case 'octahedron':
+            // Octahedron vertices (centered at origin)
+            let oA = new Point(1, 0, 0)
+            let oB = new Point(-1, 0, 0)
+            let oC = new Point(0, 1, 0)
+            let oD = new Point(0, -1, 0)
+            let oE = new Point(0, 0, 1)
+            let oF = new Point(0, 0, -1)
+            points = [oA, oB, oC, oD, oE, oF]
 
+            points.push(...interpolateLine(oA, oC))
+            points.push(...interpolateLine(oA, oD))
+            points.push(...interpolateLine(oA, oE))
+            points.push(...interpolateLine(oA, oF))
+            points.push(...interpolateLine(oB, oC))
+            points.push(...interpolateLine(oB, oD))
+            points.push(...interpolateLine(oB, oE))
+            points.push(...interpolateLine(oB, oF))
+            points.push(...interpolateLine(oC, oE))
+            points.push(...interpolateLine(oC, oF))
+            points.push(...interpolateLine(oD, oE))
+            points.push(...interpolateLine(oD, oF))
+            break
+        }
+        return points
+      }
+
+      let mouseRotMat = new Matrix()
+
+      function transform(points) {
+        let rotX_rad = rotX * (Math.PI / 180)
+        let rotY_rad = rotY * (Math.PI / 180)
+        let rotZ_rad = rotZ * (Math.PI / 180)
+        let r_x = new Matrix(
+          1,
+          0,
+          0,
+          0,
+          0,
+          Math.cos(rotX_rad),
+          -Math.sin(rotX_rad),
+          0,
+          0,
+          Math.sin(rotX_rad),
+          Math.cos(rotX_rad),
+          0,
+          0,
+          0,
+          0,
+          1
+        )
+        let r_y = new Matrix(
+          Math.cos(rotY_rad),
+          0,
+          Math.sin(rotY_rad),
+          0,
+          0,
+          1,
+          0,
+          0,
+          -Math.sin(rotY_rad),
+          0,
+          Math.cos(rotY_rad),
+          0,
+          0,
+          0,
+          0,
+          1
+        )
+        let r_z = new Matrix(
+          Math.cos(rotZ_rad),
+          -Math.sin(rotZ_rad),
+          0,
+          0,
+          Math.sin(rotZ_rad),
+          Math.cos(rotZ_rad),
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        )
+        let lookAtMat = new Matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -camZ, 0, 0, 0, 1)
+        let modelViewMat = lookAtMat.mulMat(mouseRotMat.mulMat(r_z.mulMat(r_y.mulMat(r_x))))
+
+        let perspectiveMat = new Matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 / (camZ - 1), 0)
+
+        let scaleMat = new Matrix(250, 0, 0, 0, 0, 250, 0, 0, 0, 0, 1, 0, 0, 0, -1, 0)
+
+        let projectionMat = scaleMat.mulMat(perspectiveMat.mulMat(modelViewMat))
+
+        let res = []
+        for (let i = 0; i < points.length; i++) {
+          let p = projectionMat.mulVec(points[i])
+          p.dehomogen()
+          res.push(p)
+        }
+        return res
+      }
+
+      points = createPoints()
+
+      function update() {
+        ctx.clearRect(0, 0, 500, 500)
+        drawPoints(transform(points))
+      }
+
+      update()
+
+      let down = false
+      let x0
+      let y0
+
+      document.getElementById('canvas').addEventListener('mousedown', function (event) {
+        down = true
+        x0 = event.clientX - 250
+        y0 = 250 - event.clientY
+      })
+
+      let mx_rad = 0
+      let my_rad = 0
+
+      document.getElementById('canvas').addEventListener('mousemove', function (event) {
+        if (down) {
+          let x1 = event.clientX - 250
+          let y1 = 250 - event.clientY
+          if (x0 !== x1 || y0 !== y1) {
+            mx_rad = -(y1 - y0) / 159.1549427671505
+            my_rad = (x1 - x0) / 159.1549427671505
+            let mr_x = new Matrix(
+              1,
+              0,
+              0,
+              0,
+              0,
+              Math.cos(mx_rad),
+              -Math.sin(mx_rad),
+              0,
+              0,
+              Math.sin(mx_rad),
+              Math.cos(mx_rad),
+              0,
+              0,
+              0,
+              0,
+              1
+            )
+            let mr_y = new Matrix(
+              Math.cos(my_rad),
+              0,
+              Math.sin(my_rad),
+              0,
+              0,
+              1,
+              0,
+              0,
+              -Math.sin(my_rad),
+              0,
+              Math.cos(my_rad),
+              0,
+              0,
+              0,
+              0,
+              1
+            )
+
+            mouseRotMat = mr_y.mulMat(mr_x.mulMat(mouseRotMat))
+
+            update()
+            x0 = x1
+            y0 = y1
+          }
+        }
+      })
+
+      // use mousewheel to adjust camZ
+      document.getElementById('canvas').addEventListener('wheel', function (event) {
+        const delta = Math.sign(event.deltaY)
+        console.info(delta)
+        if (delta === 1 && camZ <= 9.9) {
+          camZ += 0.1
+          camZ = Math.round(camZ * 10) / 10
+          camZOut.innerHTML = camZ
+          update()
+        } else if (delta === -1 && camZ >= 2.1) {
+          camZ -= 0.1
+          camZ = Math.round(camZ * 10) / 10
+          camZOut.innerHTML = camZ
+          update()
+        }
+      })
+
+      document.getElementById('canvas').addEventListener('mouseup', function () {
+        down = false
+      })
     </script>
-</body>
-
+  </body>
 </html>
