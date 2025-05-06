@@ -89,7 +89,7 @@
       camZIn.value = camZ
       camZOut.innerHTML = camZ
       camZIn.oninput = function () {
-        camZ = parseInt(this.value)
+        camZ = Number(this.value)
         camZOut.innerHTML = camZ
         update()
       }
