@@ -225,11 +225,34 @@
       }
 
       function createLines() {
-        let lines = []
+        const A = new Point(-100, -100, -100)
+        const B = new Point(100, -100, -100)
+        const C = new Point(100, -100, 100)
+        const D = new Point(-100, -100, 100)
 
-        // TODO: Aufgabe a1
+        const E = new Point(-100, 100, -100)
+        const F = new Point(100, 100, -100)
+        const G = new Point(100, 100, 100)
+        const H = new Point(-100, 100, 100)
 
-        return lines
+        const pointPairs = [
+          // Bottom 4 lines
+          [A, B],
+          [B, C],
+          [C, D],
+          [D, A],
+          // Top 4 lines
+          [E, F],
+          [F, G],
+          [G, H],
+          [H, E],
+          // Connecting lines
+          [A, E],
+          [B, F],
+          [C, G],
+          [D, H]
+        ]
+        return pointPairs.map((pair) => new Line(...pair))
       }
 
       function createTriangles() {
