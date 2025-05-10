@@ -206,7 +206,7 @@
             setPixel(line.a.x, line.a.y);
             setPixel(line.b.x, line.b.y);
 
-            // TODO: Aufgabe a2 und Bonusaufgabe
+            // DONE: Aufgabe a2 und Bonusaufgabe
             const a = line.a;
             const b = line.b;
             if (Math.abs(b.y - a.y) < Math.abs(b.x - a.x)) {
@@ -292,7 +292,46 @@
             setPixel(triangle.b.x, triangle.b.y, triangle.color);
             setPixel(triangle.c.x, triangle.c.y, triangle.color);
 
-            // TODO: Aufgabe b2
+            // extract points
+            const A = triangle.a;
+            const B = triangle.b;
+            const C = triangle.c;
+
+            // DONE: Aufgabe b2
+            // check if p is in triangle
+            function inTriangle(p) {
+                // Returns double the signed area but that's fine
+                function edgeFunction(a, b, c) {
+                    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+                }
+                // if all have the same sign p is in triangle
+                // if at least one doesn't it's outside
+                if ((edgeFunction(A, B, p) >= 0
+                        && edgeFunction(B, C, p) >= 0
+                        && edgeFunction(C, A, p) >= 0)
+                    || (edgeFunction(A, B, p) <= 0
+                        && edgeFunction(B, C, p) <= 0
+                        && edgeFunction(C, A, p) <= 0)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            // create bounding box
+            const minX = Math.min(A.x, B.x, C.x);
+            const minY = Math.min(A.y, B.y, C.y);
+            const maxX = Math.max(A.x, B.x, C.x);
+            const maxY = Math.max(A.y, B.y, C.y);
+
+            // loop through box
+            for (x = minX; x < maxX; x++) {
+                for (y = minY; y < maxY; y++) {
+                    if (inTriangle(new Point(x, y))) {
+                        setPixel(x, y, triangle.color);
+                    }
+                }
+            }
 
         }
 
@@ -352,7 +391,31 @@
         function createTriangles() {
             let triangles = [];
 
-            // TODO: Aufgabe b1
+            // DONE: Aufgabe b1
+            triangles.push(new Triangle(
+                new Point(75, 75, 75),
+                new Point(75, -75, -75),
+                new Point(-75, 75, -75),
+                [132, 45, 187]
+            ));
+            triangles.push(new Triangle(
+                new Point(75, 75, 75),
+                new Point(75, -75, -75),
+                new Point(-75, -75, 75),
+                [24, 200, 68]
+            ));
+            triangles.push(new Triangle(
+                new Point(75, 75, 75),
+                new Point(-75, 75, -75),
+                new Point(-75, -75, 75),
+                [755, 183, 61]
+            ));
+            triangles.push(new Triangle(
+                new Point(75, -75, -75),
+                new Point(-75, 75, -75),
+                new Point(-75, -75, 75),
+                [77, 115, 245]
+            ));
 
             return triangles;
         }
