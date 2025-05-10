@@ -239,7 +239,34 @@
         setPixel(triangle.b.x, triangle.b.y, triangle.color)
         setPixel(triangle.c.x, triangle.c.y, triangle.color)
 
-        // TODO: Aufgabe b2
+        const minX = Math.min(triangle.a.x, triangle.b.x, triangle.c.x)
+        const maxX = Math.max(triangle.a.x, triangle.b.x, triangle.c.x)
+        const minY = Math.min(triangle.a.y, triangle.b.y, triangle.c.y)
+        const maxY = Math.max(triangle.a.y, triangle.b.y, triangle.c.y)
+
+        const EFuncs = [
+          [triangle.a, triangle.b],
+          [triangle.b, triangle.c],
+          [triangle.c, triangle.a]
+        ].map(([a, b]) => {
+          const dy = b.y - a.y
+          const neg_dx = a.x - b.x
+          function E(x, y) {
+            return dy * x + neg_dx * y - (dy * a.x + neg_dx * a.y)
+          }
+          return E
+        })
+
+        function inTriangle(x, y) {
+          const EResults = EFuncs.map((E) => E(x, y))
+          return EResults.every((val) => val > 0) || EResults.every((val) => val < 0)
+        }
+
+        for (let x = minX; x <= maxX; x++) {
+          for (let y = minY; y <= maxY; y++) {
+            if (inTriangle(x, y)) setPixel(x, y, triangle.color)
+          }
+        }
       }
 
       function createLines() {
