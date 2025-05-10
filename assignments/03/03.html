@@ -12,6 +12,8 @@
     <p><label for="drawLinesIn">Zeichne Linien </label><input type="checkbox" id="drawLinesIn" /></p>
     <p><label for="drawTrianglesIn">Zeichne Dreiecke </label><input type="checkbox" id="drawTrianglesIn" /></p>
     <p><label for="antialiasingIn">Antialiasing </label><input type="checkbox" id="antialiasingIn" /></p>
+    <!-- Lodash -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17/lodash.min.js "></script>
     <script>
       let drawLines = true
       let drawTriangles = true
@@ -212,7 +214,23 @@
         setPixel(line.a.x, line.a.y)
         setPixel(line.b.x, line.b.y)
 
-        // TODO: Aufgabe a2 und Bonusaufgabe
+        const {
+          a: { x: a_x, y: a_y },
+          b: { x: b_x, y: b_y }
+        } = line
+        const m = (b_y - a_y) / (b_x - a_x)
+        if (Math.abs(m) < 1) {
+          // Linie ist flach
+          for (const x of _.range(a_x, b_x)) {
+            setPixel(x, (x - a_x) * m + a_y)
+          }
+        } else {
+          // Linie ist steil
+          const m_y = (b_x - a_x) / (b_y - a_y)
+          for (const y of _.range(a_y, b_y)) {
+            setPixel((y - a_y) * m_y + a_x, y)
+          }
+        }
       }
 
       function drawTriangle(triangle) {
