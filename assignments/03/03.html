@@ -207,7 +207,83 @@
             setPixel(line.b.x, line.b.y);
 
             // TODO: Aufgabe a2 und Bonusaufgabe
+            const a = line.a;
+            const b = line.b;
+            if (Math.abs(b.y - a.y) < Math.abs(b.x - a.x)) {
+                // horizontal-ish lines
+                let start = null;
+                let end = null;
+                if (a.x <= b.x) {
+                    start = a;
+                    end = b;
+                } else {
+                    start = b;
+                    end = a;
+                }
 
+                let dx = end.x - start.x;
+                let dy = end.y - start.y;
+                let yi = 1;
+                // negative slopes (\)
+                if (dy < 0) {
+                    yi = -1;
+                    dy = -dy;
+                }
+
+                // accumulated error
+                let E = 2 * dy - dx;
+
+                let x = start.x;
+                let y = start.y;
+
+                while (x < end.x) {
+                    if (E <= 0) {
+                        E += 2 * dy;
+                    } else {
+                        y += yi;
+                        E += 2 * dy - 2 * dx;
+                    }
+                    x += 1;
+                    setPixel(x, y);
+                }
+            } else {
+                // vertical-ish lines
+                let start = null;
+                let end = null;
+                if (a.y <= b.y) {
+                    start = a;
+                    end = b;
+                } else {
+                    start = b;
+                    end = a;
+                }
+
+                let dx = end.x - start.x;
+                let dy = end.y - start.y;
+                let xi = 1;
+                // negative slopes (\)
+                if (dx < 0) {
+                    xi = -1;
+                    dx = -dx;
+                }
+
+                // accumulated error
+                let E = 2 * dx - dy;
+
+                let x = start.x;
+                let y = start.y;
+
+                while (y < end.y) {
+                    if (E <= 0) {
+                        E += 2 * dx;
+                    } else {
+                        x += xi;
+                        E += 2 * dx - 2 * dy;
+                    }
+                    y += 1;
+                    setPixel(x, y);
+                }
+            }
         }
 
         function drawTriangle(triangle) {
