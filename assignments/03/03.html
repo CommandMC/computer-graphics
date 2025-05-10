@@ -223,7 +223,52 @@
         function createLines() {
             let lines = [];
 
-            // TODO: Aufgabe a1
+            // DONE: Aufgabe a1
+            // as usual basic cube for now
+            const len = 100;
+            const coord_pool = [ len/2, -len/2 ];
+            // create corners
+            let points = [];
+            for (x of coord_pool) {
+                for (y of coord_pool) {
+                    for (z of coord_pool) {
+                        points.push(new Point(x, y, z));
+                    }
+                }
+            }
+            // connect points
+            for (a of points) {
+                for (b of points) {
+                    // don't add duplicates in the other direction
+                    let has_line = false;
+                    for (line of lines) {
+                        if (line.a === b && line.b === a) {
+                            has_line = true;
+                        }
+                    }
+                    if (has_line) {
+                        continue;
+                    }
+
+                    // add only where a single coord differs
+                    // to avoid diagonals
+                    let diffs = 0;
+                    if (a.x != b.x) {
+                        diffs += 1;
+                    }
+                    if (a.y != b.y) {
+                        diffs += 1;
+                    }
+                    if (a.z != b.z) {
+                        diffs += 1;
+                    }
+                    if (diffs === 1) {
+                        console.log("Adding Line", a, b)
+                        lines.push(new Line(a, b));
+                    }
+                }
+            }
+            console.log(`Created ${lines.length} Lines`)
 
             return lines;
         }
