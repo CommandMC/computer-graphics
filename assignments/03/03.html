@@ -289,7 +289,8 @@
           const v1 = parsedTeapotData.pop()
           const v2 = parsedTeapotData.pop()
           const v3 = parsedTeapotData.pop()
-          triangles.push(new Triangle(v1, v2, v3))
+          const randColor = [_.random(255), _.random(255), _.random(255)]
+          triangles.push(new Triangle(v1, v2, v3, randColor))
         }
 
         return triangles
