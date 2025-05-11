@@ -209,28 +209,137 @@
         }
       }
 
-      function drawLine(line) {
-        // Test a
-        setPixel(line.a.x, line.a.y)
-        setPixel(line.b.x, line.b.y)
+      function drawLineBase(line) {
+          // pixels to draw as list of [x,y] tuples
+          let pixels = []
 
-        const {
-          a: { x: a_x, y: a_y },
-          b: { x: b_x, y: b_y }
-        } = line
-        const m = (b_y - a_y) / (b_x - a_x)
-        if (Math.abs(m) < 1) {
-          // Linie ist flach
-          for (const x of _.range(a_x, b_x)) {
-            setPixel(x, (x - a_x) * m + a_y)
+          const a = line.a;
+          const b = line.b;
+          if (Math.abs(b.y - a.y) < Math.abs(b.x - a.x)) {
+              // horizontal-ish lines
+              let start = null;
+              let end = null;
+              if (a.x <= b.x) {
+                  start = a;
+                  end = b;
+              } else {
+                  start = b;
+                  end = a;
+              }
+
+              let dx = end.x - start.x;
+              let dy = end.y - start.y;
+              let yi = 1;
+              // negative slopes (\)
+              if (dy < 0) {
+                  yi = -1;
+                  dy = -dy;
+              }
+
+              // accumulated error
+              let E = 2 * dy - dx;
+
+              let x = start.x;
+              let y = start.y;
+
+              while (x < end.x) {
+                  if (E <= 0) {
+                      E += 2 * dy;
+                  } else {
+                      y += yi;
+                      E += 2 * dy - 2 * dx;
+                  }
+                  x += 1;
+                  pixels.push([x, y]);
+              }
+          } else {
+              // vertical-ish lines
+              let start = null;
+              let end = null;
+              if (a.y <= b.y) {
+                  start = a;
+                  end = b;
+              } else {
+                  start = b;
+                  end = a;
+              }
+
+              let dx = end.x - start.x;
+              let dy = end.y - start.y;
+              let xi = 1;
+              // negative slopes (\)
+              if (dx < 0) {
+                  xi = -1;
+                  dx = -dx;
+              }
+
+              // accumulated error
+              let E = 2 * dx - dy;
+
+              let x = start.x;
+              let y = start.y;
+
+              while (y < end.y) {
+                  if (E <= 0) {
+                      E += 2 * dx;
+                  } else {
+                      x += xi;
+                      E += 2 * dx - 2 * dy;
+                  }
+                  y += 1;
+                  pixels.push([x, y]);
+              }
           }
-        } else {
-          // Linie ist steil
-          const m_y = (b_x - a_x) / (b_y - a_y)
-          for (const y of _.range(a_y, b_y)) {
-            setPixel((y - a_y) * m_y + a_x, y)
+          return pixels;
+      }
+
+      // draw a line at 8x resolution, then combine 8x8 blocks
+      // to a single pixel adjusting brightness
+      function drawLineSuperSampled(line) {
+          const factor = 8;
+          const ss_line = new Line(
+              new Point(line.a.x * factor, line.a.y * factor),
+              new Point(line.b.x * factor, line.b.y * factor)
+          );
+          const ss_pixels = drawLineBase(ss_line);
+
+          // recalculate brightness
+          // gives rgb value from 255 to 0
+          // decreases less when prev is already low
+          function brightness(prev = 255) {
+              const k = Math.log(256) / factor;
+              const next = prev * Math.exp(-k);
+              const val = Math.max(0, Math.round(next));
+              return [val, val, val];
           }
-        }
+
+          let pixels = [];
+          for (ss_pixel of ss_pixels) {
+              x = Math.floor(ss_pixel[0] / factor);
+              y = Math.floor(ss_pixel[1] / factor);
+              let idx = pixels.findIndex((pix) => pix[0] === x && pix[1] === y);
+              if (idx === -1) {
+                  // add with base brightness if not already present
+                  pixels.push([x, y, brightness()]);
+              } else {
+                  // decrease brightness if already present
+                  pixels[idx][2] = brightness(pixels[idx][2]);
+              }
+          }
+          return pixels;
+      }
+
+      // wrapper to handle antialiasing
+      function drawLine(line) {
+          if (antialiasing) {
+              for (pixel of drawLineSuperSampled(line)) {
+                  setPixel(pixel[0], pixel[1], pixel[2]);
+              }
+          } else {
+              for (pixel of drawLineBase(line)) {
+                  setPixel(pixel[0], pixel[1]);
+              }
+          }
       }
 
       function drawTriangle(triangle) {
