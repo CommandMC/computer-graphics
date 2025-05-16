@@ -1509,12 +1509,81 @@
             }
         }
 
+        // calculate center point of a triangle
+        function triangleCenter(tri) {
+            const x = (tri.a.x, tri.b.x, tri.c.x) / 3;
+            const y = (tri.a.y, tri.b.y, tri.c.y) / 3;
+            const z = (tri.a.z, tri.b.z, tri.c.z) / 3;
+            return new Point(x, y, z);
+        }
+
+        // calculate view vector from eye/cam pos and a vector x
+        // we assume camera to be (0,0,0)
+        function viewVec(x) {
+            const cam = new Point(0,0,0);
+            const cam_vec = cam.sub(new Point());
+            return cam_vec.sub(x).normalize();
+        }
+
+        // calculate light vector from light source y and a vector x
+        // slides don't say what vector y is supposed to be so I'll just assume
+        // it's equivalent to the light source Point
+        function lightVec(x) {
+            const y = lightPos;
+            const y_vec = y.sub(new Point())
+            return y_vec.sub(x).normalize();
+        }
+
+        // calculate halfway vector from view vector v and light vector l
+        function halfwayVec(v, l) {
+            return v.add(l).normalize();
+        }
+
+        // calculate the normal vector from vector x
+        // this is from the assignment sheet
+        function normVec(x) {
+            return x.add(new Vector(0,0,2)).normalize();
+        }
+
+        // do phong lighting
+        function phongLight(color, light_vec, halfway_vec, norm_vec) {
+            // ambient and diffuse use the triangle's color
+            const ambient = color.mul(inputs["ambient"]);
+            const diffuse = color.mul(inputs["diffuse"]);
+            // specular uses a reflection of (1,1,1) according to assignment sheet
+            const specular = new Vector(1,1,1).mul(inputs["specular"]);
+            // just a shiny copy
+            const shininess = inputs["shininess"];
+
+            // parts to add up
+            const parts = [];
+            parts.push(ambient);
+            parts.push(diffuse.mul(light_vec.dot(norm_vec)));
+            parts.push(specular.mul(Math.pow(halfway_vec.dot(norm_vec), shininess)));
+
+            // calculate RGB vector
+            // Full disclaimer - I have no idea whatsoever if any of this is correct
+            // but the result looks good enough (besides lightZ beeing pretty much
+            // useless anywhere on the lower half of the slider)
+            return parts[0].add(parts[1]).add(parts[2]).mulVec(lightColor);
+        }
+
         function light(triangle) {
             let triColor = triangle.color;
 
-            // TODO: Aufgabe 2
+            // DONE: Aufgabe 2
+            // calculate required vectors
+            const center = triangleCenter(triangle);
+            // x is triangle center from POV of cam at (0,0,0)
+            const x = center.sub(new Point(0,0,0));
+            const n = normVec(x);
+            const v = viewVec(x);
+            const l = lightVec(x);
+            const h = halfwayVec(v, l);
 
-            return triColor;
+            const res = phongLight(triColor, l, h, n)
+
+            return res;
         }
 
         function createTriangles() {
