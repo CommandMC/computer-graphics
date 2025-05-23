@@ -1453,13 +1453,30 @@
 
         function resetBuffers() {
 
-            // TODO: Aufgabe a
-
+            // DONE: Aufgabe a
+            for (let x = 0; x < size; x += 1) {
+                for (let y = 0; y < size; y += 1) {
+                    // color is a Vector with 3 values (RGB 0-255)
+                    // default to white
+                    colorBuffer[x][y] = new Vector(255,255,255);
+                    // z value is just a number
+                    // default to Infinity
+                    zBuffer[x][y] = Infinity;
+                }
+            }
         }
 
         function updateBuffers(row, col, z, color) {
+            // give these sane 2d coordinate names
+            // (why would we have z but not x/y?)
+            const x = row;
+            const y = col;
 
-            // TODO: Aufgabe b
+            // DONE: Aufgabe b
+            if (z < zBuffer[x][y]) {
+                zBuffer[x][y] = z;
+                colorBuffer[x][y] = color;
+            }
 
         }
 
