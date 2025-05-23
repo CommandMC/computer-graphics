@@ -1419,11 +1419,12 @@
         }
 
         class Triangle {
-            constructor(a, b, c, color) {
+            constructor(a, b, c, color, alpha) {
                 this.a = a;
                 this.b = b;
                 this.c = c;
                 this.color = color;
+                this.alpha = alpha;
             }
         }
 
@@ -1449,35 +1450,83 @@
         const lightColor = new Vector(1, 1, 1);
         let lightPos;
         let colorBuffer = new Array(size).fill(0).map(() => new Array(size));
-        let zBuffer = new Array(size).fill(0).map(() => new Array(size));
+        let alphaBuffer = new Array(size).fill(0).map(() => new Array(size));
+
+        // a pixel in alphaBuffer
+        class AlphaPixel {
+            // initialise empty AlphaPixel
+            // to be called by resetBuffers
+            // @param bg  background color
+            constructor(bg = new Vector(1.0,1.0,1.0)) {
+                this.data = [
+                    [bg, Infinity, 1.0]
+                ];
+            }
+
+            // insert another "layer"
+            // @param color  pixel color vector
+            // @param z      z value in scene
+            // @param alpha  opacity 0.0 - 1.0
+            insert(color, z, alpha) {
+                // we'll insert layers sorted so we don't
+                // have to sort later on
+                // biggest z first
+                for (let i = 0; i <= this.data.length; i += 1) {
+                    if (i === this.data.length) {
+                        this.data.push([color, z, alpha]);
+                        break;
+                    }
+                    if (z >= this.data[i][1]) {
+                        this.data.splice(i, 0, [color, z, alpha]);
+                        break;
+                    }
+                }
+            }
+
+            // calculate resulting color
+            color() {
+                let color = null;
+
+                // insert() already pre-sorted this
+                for (const layer of this.data) {
+                    const c = layer[0];
+                    const a = layer[2];
+                    // background
+                    if (color === null) {
+                        color = c;
+                    }
+                    color = new Vector(
+                        a * c.x + (1 - a) * color.x,
+                        a * c.y + (1 - a) * color.y,
+                        a * c.z + (1 - a) * color.z
+                    );
+                }
+                return color;
+            }
+        }
 
         function resetBuffers() {
 
             // DONE: Aufgabe a
             for (let x = 0; x < size; x += 1) {
                 for (let y = 0; y < size; y += 1) {
-                    // color is a Vector with 3 values (RGB 0-255)
-                    // default to white
-                    colorBuffer[x][y] = new Vector(255,255,255);
-                    // z value is just a number
-                    // default to Infinity
-                    zBuffer[x][y] = Infinity;
+                    // initialise empty AlphaPixel for each coordinate
+                    // with deault (white) background
+                    alphaBuffer[x][y] = new AlphaPixel();
                 }
             }
         }
 
-        function updateBuffers(row, col, z, color) {
+        function updateBuffers(row, col, z, color, alpha) {
             // give these sane 2d coordinate names
             // (why would we have z but not x/y?)
             const x = row;
             const y = col;
 
             // DONE: Aufgabe b
-            if (z < zBuffer[x][y]) {
-                zBuffer[x][y] = z;
-                colorBuffer[x][y] = color;
+            if (![x, y].some((coord) => coord < 0 || coord >= size)) {
+                alphaBuffer[x][y].insert(color, z, alpha);
             }
-
         }
 
         function draw() {
@@ -1485,9 +1534,9 @@
             image = ctx.createImageData(size, size);
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    let c = colorBuffer[i][j];
 
                     // Bonusaufgabe
+                    let c = alphaBuffer[i][j].color();
 
                     let pixel = [255 * c.x, 255 * c.y, 255 * c.z, 255];
                     for (let k = 0; k < 4; k++) {
@@ -1500,7 +1549,7 @@
 
         function createTriangles() {
 
-            function sphere(position, radius, color) {
+            function sphere(position, radius, color, alpha) {
                 let triangles = [];
                 for (let i = 0; i < F.length / 3; i++) {
                     let points = [];
@@ -1510,12 +1559,16 @@
                             V[3 * F[3 * i + j] + 1] * radius + position.y,
                             V[3 * F[3 * i + j] + 2] * radius + position.z));
                     }
-                    triangles.push(new Triangle(points[0], points[1], points[2], color));
+                    triangles.push(new Triangle(points[0], points[1], points[2], color, alpha));
                 }
                 return triangles;
             }
 
-            return sphere(new Point(0, 0, 0), 100, new Vector(0, 1, 0.8));
+            const all = new Array();
+            return all.concat(
+                sphere(new Point(0, 0, 0), 100, new Vector(0, 1, 0.8), 0.8),
+                sphere(new Point(150, 0, 0), 30, new Vector(0.4, 0.6, 0.1), 0.5)
+            );
         }
 
         let triangles = createTriangles();
@@ -1574,7 +1627,7 @@
                             let z = alpha * a.z + beta * b.z + gamma * c.z;
                             let row = -y + size / 2;
                             let col = x + size / 2;
-                            updateBuffers(row, col, z, light(transformed));
+                            updateBuffers(row, col, z, light(transformed), transformed.alpha);
                         }
                     }
                 }
