@@ -1449,8 +1449,6 @@
         );
         const lightColor = new Vector(1, 1, 1);
         let lightPos;
-        let colorBuffer = new Array(size).fill(0).map(() => new Array(size));
-        let alphaBuffer = new Array(size).fill(0).map(() => new Array(size));
 
         // a pixel in alphaBuffer
         class AlphaPixel {
@@ -1458,8 +1456,18 @@
             // to be called by resetBuffers
             // @param bg  background color
             constructor(bg = new Vector(1.0,1.0,1.0)) {
+                this.bg = bg;
+                this.reset();
+            }
+
+            // optimization:
+            // at least in Firefox GC is super slow
+            // when we just create new AlphaPixel
+            // on each resetBuffers() call
+            // just resetting the internal list gives ~2x speedup
+            reset() {
                 this.data = [
-                    [bg, Infinity, 1.0]
+                    [this.bg, Infinity, 1.0]
                 ];
             }
 
@@ -1468,26 +1476,19 @@
             // @param z      z value in scene
             // @param alpha  opacity 0.0 - 1.0
             insert(color, z, alpha) {
-                // we'll insert layers sorted so we don't
-                // have to sort later on
-                // biggest z first
-                for (let i = 0; i <= this.data.length; i += 1) {
-                    if (i === this.data.length) {
-                        this.data.push([color, z, alpha]);
-                        break;
-                    }
-                    if (z >= this.data[i][1]) {
-                        this.data.splice(i, 0, [color, z, alpha]);
-                        break;
-                    }
-                }
+                this.data.push([color, z, alpha])
             }
 
             // calculate resulting color
             color() {
-                let color = null;
+                // sort layers by decreasing z
+                // more complex scenes might benefit from sorted
+                // insert() but in our scene this.data.length is only ~5
+                this.data.sort(
+                    (a, b) => -(a[1] - b[1])
+                );
 
-                // insert() already pre-sorted this
+                let color = null;
                 for (const layer of this.data) {
                     const c = layer[0];
                     const a = layer[2];
@@ -1505,6 +1506,9 @@
             }
         }
 
+        // initialise the buffers
+        const alphaBuffer = new Array(size).fill(0).map(() => new Array(size).fill(0).map(() => new AlphaPixel()));
+
         function resetBuffers() {
 
             // DONE: Aufgabe a
@@ -1512,7 +1516,7 @@
                 for (let y = 0; y < size; y += 1) {
                     // initialise empty AlphaPixel for each coordinate
                     // with deault (white) background
-                    alphaBuffer[x][y] = new AlphaPixel();
+                    alphaBuffer[x][y].reset();
                 }
             }
         }
