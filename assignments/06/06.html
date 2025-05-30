@@ -1527,7 +1527,7 @@
                 vec3 l = normalize(uLightPos - vPosition);
                 // assuming camera is at 0,0,0
                 vec3 v = normalize(vec3(0,0,0) - vPosition);
-                vec3 r = 2.0 * n * n * l - l;
+                vec3 r = 2.0 * n * dot(n, l) - l;
 
                 // coefficients
                 vec3 c_a = uAmbient * vColor;
@@ -1535,7 +1535,6 @@
                 vec3 c_s = uSpecular * vec3(1.0,1.0,1.0);
 
                 // phong lighting
-                // uShininess feels somewhat weird here but I don't know what could be wrong
                 vec3 color = (c_a + c_d * max(dot(l,n), 0.0) + c_s * pow(max(dot(v,r), 0.0), uShininess)) * vColor * uLightColor;
 
                 gl_FragColor = vec4(color, 1);
