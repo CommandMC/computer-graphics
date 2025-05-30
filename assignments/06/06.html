@@ -54,6 +54,10 @@
         <p>Shininess: <span id="shininessOut"></span></p>
         <label for="shininessIn"></label><input type="range" id="shininessIn" min="0.1" max="100" step="0.1" class="slider">
     </div>
+    <div>
+        <p>Step: <span id="stepOut"></span></p>
+        <label for="stepIn"></label><input type="range" id="stepIn" min="0.01" max="1.0" step="0.01" class="slider">
+    </div>
     <script>
 
         const V = [
@@ -1274,8 +1278,8 @@
             inputs["bonus"] = this.checked;
             update();
         };
-        const names = ["lightX", "lightY", "lightZ", "ambient", "diffuse", "specular", "shininess"];
-        const initialValues = [2, 2, 0, 0.3, 0.7, 0.1, 10];
+        const names = ["lightX", "lightY", "lightZ", "ambient", "diffuse", "specular", "shininess", "step"];
+        const initialValues = [2, 2, 0, 0.3, 0.7, 0.1, 10, 0.2];
         for (let i = 0; i < names.length; i++) {
             inputs[names[i]] = initialValues[i];
             let sliderIn = document.getElementById(names[i] + "In");
@@ -1485,6 +1489,7 @@
             uniform float uSpecular;
             uniform float uShininess;
             uniform bool uBonus;
+            uniform float uStep;
 
             varying vec3 vPosition;
             varying vec3 vNormal;
@@ -1514,19 +1519,30 @@
             uniform float uSpecular;
             uniform float uShininess;
             uniform bool uBonus;
+            uniform float uStep;
 
             varying vec3 vPosition;
             varying vec3 vNormal;
             varying vec3 vColor;
 
-            void main(void) {
+            float round_to_step(in float val, in float step) {
+                float lower = val - mod(val, step);
+                float upper = lower + step;
 
+                if (val - lower < upper - val) {
+                    return lower;
+                } else {
+                    return upper;
+                }
+            }
+
+            void main(void) {
                 // DONE: Aufgabe c
                 // vectors
                 vec3 n = normalize(vNormal);
                 vec3 l = normalize(uLightPos - vPosition);
                 // assuming camera is at 0,0,0
-                vec3 v = normalize(vec3(0,0,0) - vPosition);
+                vec3 v = normalize(vec3(0.0,0.0,0.0) - vPosition);
                 vec3 r = 2.0 * n * dot(n, l) - l;
 
                 // coefficients
@@ -1540,7 +1556,18 @@
                 // happens automatically
                 vec3 color = (c_a + c_d * max(dot(l,n), 0.0) + c_s * pow(max(dot(v,r), 0.0), uShininess)) * vColor * uLightColor;
 
-                gl_FragColor = vec4(color, 1);
+                if (!uBonus) {
+                    gl_FragColor = vec4(color, 1.0);
+                    return;
+                }
+
+                // DONE: Bonus
+                // round colors into "steps"
+                float color_r = round_to_step(color.r, uStep);
+                float color_g = round_to_step(color.g, uStep);
+                float color_b = round_to_step(color.b, uStep);
+
+                gl_FragColor = vec4(color_r, color_g, color_b, 1.0);
             }
         `;
 
@@ -1589,7 +1616,8 @@
                 diffuse: gl.getUniformLocation(shaderProgram, 'uDiffuse'),
                 specular: gl.getUniformLocation(shaderProgram, 'uSpecular'),
                 shininess: gl.getUniformLocation(shaderProgram, 'uShininess'),
-                bonus: gl.getUniformLocation(shaderProgram, 'uBonus')
+                bonus: gl.getUniformLocation(shaderProgram, 'uBonus'),
+                step: gl.getUniformLocation(shaderProgram, 'uStep')
             }
         };
 
@@ -1724,6 +1752,7 @@
             gl.uniform1f(programInfo.uniformLocations.specular, inputs["specular"]);
             gl.uniform1f(programInfo.uniformLocations.shininess, inputs["shininess"]);
             gl.uniform1i(programInfo.uniformLocations.bonus, inputs["bonus"]);
+            gl.uniform1f(programInfo.uniformLocations.step, inputs["step"]);
 
             {
                 const type = gl.UNSIGNED_SHORT;
