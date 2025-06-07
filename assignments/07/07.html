@@ -251,6 +251,7 @@
 
             attribute vec4 aPosition;
             attribute vec4 aNormal;
+            attribute vec2 aTextureCoordinate;
 
             uniform mat4 uModelViewMatrix;
             uniform mat4 uNormalMatrix;
@@ -264,13 +265,15 @@
 
             varying vec3 vPosition;
             varying vec3 vNormal;
+            varying vec2 vTextureCoordinate;
 
             void main(void) {
                 vec4 modelViewPosition = uModelViewMatrix * aPosition;
                 vPosition = modelViewPosition.xyz;
                 vNormal = normalize((uNormalMatrix * aNormal).xyz);
 
-                // TODO: Aufgabe a
+                // DONE: Aufgabe a
+                vTextureCoordinate  = aTextureCoordinate;
 
                 gl_Position = uProjectionMatrix * modelViewPosition;
             }
@@ -289,20 +292,23 @@
             uniform float uDiffuse;
             uniform float uSpecular;
             uniform float uShininess;
+            uniform sampler2D uTexture;
 
             varying vec3 vPosition;
             varying vec3 vNormal;
+            varying vec2 vTextureCoordinate;
 
             void main(void) {
 
-                // TODO: Aufgaben b und c
+                // DONE: Aufgaben b und c
+                vec3 texColor = texture2D(uTexture, vTextureCoordinate).rgb;
 
                 vec3 n = normalize(vNormal);
                 vec3 v = normalize(-vPosition);
                 vec3 l = normalize(uLightPos - vPosition);
                 vec3 r = 2.0 * n * dot(n, l) - l;
-                vec3 Ca = uAmbient * vec3(1, 0, 1);
-                vec3 Cd = uDiffuse * vec3(1, 0, 1);
+                vec3 Ca = uAmbient * texColor;
+                vec3 Cd = uDiffuse * texColor;
                 vec3 Cs = uSpecular * vec3(1, 1, 1);
                 float s = uShininess;
                 vec3 color = (Ca + Cd * max(0.0, dot(l, n)) + Cs * pow(max(0.0, dot(v, r)), s)) * uLightColor;
