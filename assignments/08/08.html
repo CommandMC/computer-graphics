@@ -347,13 +347,46 @@
             coordinates[index * 3 + 2] = p.z;
         }
 
-        // TODO: Aufgabe b
+        // DONE: Aufgabe b
+        function isBoundary(v) {
+            // visit entire 1 ring and check if an edge
+            // is on the boundary
+            let ptr = out[v];
+            const first = ptr;
+            while (true) {
+                // incident boundary edge -> v is boundary
+                if (face[ptr] === -1) {
+                    return true;
+                }
+
+                // point back
+                ptr = opposite[ptr];
+
+                // incident boundary edge -> v is boundary
+                if (face[ptr] === -1) {
+                    return true;
+                }
+
+                // next
+                ptr = next[ptr];
+
+                // we reached the pointer where we started
+                // meaning v is not boundary
+                if (ptr === first) {
+                    return false;
+                }
+            }
+        }
 
         function smooth(n) {
             for (let i = 0; i < n; i++) {
 
                 // DONE: Aufgabe a
                 for (let v = 0; v < numVertices; v += 1) {
+                    if (fixBoundary && isBoundary(v)) {
+                        continue;
+                    }
+
                     let x_sum = 0;
                     let y_sum = 0;
                     let z_sum = 0;
