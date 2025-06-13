@@ -352,8 +352,47 @@
         function smooth(n) {
             for (let i = 0; i < n; i++) {
 
-                // TODO: Aufgabe a
+                // DONE: Aufgabe a
+                for (let v = 0; v < numVertices; v += 1) {
+                    let x_sum = 0;
+                    let y_sum = 0;
+                    let z_sum = 0;
+                    let count = 0;
 
+                    // collect entire 1 ring
+                    let ptr = out[v];
+                    const first = ptr;
+                    while (true) {
+                        // collect
+                        const coords = getCoordinates(to[ptr]);
+                        x_sum += coords.x;
+                        y_sum += coords.y;
+                        z_sum += coords.z;
+                        count += 1;
+
+                        // point to next
+                        ptr = opposite[ptr];
+                        ptr = next[ptr];
+
+                        // we reached the pointer where we started
+                        if (ptr === first) {
+                            break;
+                        }
+                    }
+
+                    const mean = new Vector(
+                        x_sum / count,
+                        y_sum / count,
+                        z_sum / count
+                    );
+                    const curr = getCoordinates(v);
+                    const half = new Vector(
+                        (curr.x + mean.x) / 2,
+                        (curr.y + mean.y) / 2,
+                        (curr.z + mean.z) / 2,
+                    );
+                    setCoordinates(v, half);
+                }
             }
         }
 
