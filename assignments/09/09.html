@@ -470,6 +470,29 @@
             }
         }
 
+        // predictable color "generator"
+        class ColorGen {
+            constructor() {
+                this.colors = [
+                    "#9d13ff",
+                    "#ddff33",
+                    "#ff2e31",
+                    "#71ff13",
+                    "#133eff"
+                ];
+                this.next = 0;
+            }
+
+            get() {
+                if (this.next === this.colors.length) {
+                    this.next = 0;
+                }
+                const ret = this.colors[this.next];
+                this.next += 1;
+                return ret;
+            }
+        }
+
         class BezierCurve {
             constructor(points) {
                 this.points = points;
@@ -481,16 +504,58 @@
                 }
             }
 
+            deCasteljau(t) {
+                let points = this.points;
+                let retArr = [ points.slice() ]
+                while (points.length > 1) {
+                    let midpoints = [];
+                    for (let i = 0; i+1 < points.length; i += 1) {
+                        let ax = points[i].x;
+                        let ay = points[i].y;
+                        let bx = points[i+1].x;
+                        let by = points[i+1].y;
+                        // a * (1-t) + b * t = a + (b - a) * t
+                        midpoints.push(new Point(
+                            ax + (bx - ax) * t,
+                            ay + (by - ay) * t,
+                        ));
+                    }
+                    retArr.push (midpoints);
+                    points = midpoints;
+                }
+                return retArr;
+            }
+
             drawFrame(t) {
-
-                // TODO: Aufgabe a
-
+                // DONE: Aufgabe a
+                const frame = this.deCasteljau(t);
+                const colors = new ColorGen();
+                for (const segment of frame) {
+                    if (segment.length == 1) {
+                        drawPoint(segment[0], colors.get());
+                    } else {
+                        const color = colors.get();
+                        for (let i = 0; i+1 < segment.length; i += 1) {
+                            drawPoint(segment[i], color);
+                            drawPoint(segment[i+1], color);
+                            drawLine(new Line(segment[i], segment[i+1]), color);
+                        }
+                    }
+                }
             }
 
             drawCurve() {
+                // DONE: Aufgabe b
+                for (let i = 0; i <= 1000; i += 1) {
+                    // actual t is downscaled
+                    const t = i / 1000;
+                    const frame = this.deCasteljau(t);
 
-                // TODO: Aufgabe b
-
+                    // last segment of frame contains the actual target point
+                    // and only the target point
+                    const target = frame[frame.length-1][0];
+                    drawPoint(target, "#000000", 1);
+                }
             }
         }
 
